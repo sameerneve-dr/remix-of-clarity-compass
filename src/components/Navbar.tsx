@@ -47,7 +47,7 @@ export default function Navbar() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-background">
+    <header className="sticky top-0 z-50 w-full bg-background/80 backdrop-blur-sm">
       <nav className="section-container flex h-16 items-center justify-between">
         {/* Logo + Text */}
         <Link to="/" className="flex items-center gap-2 hover:opacity-80 transition-opacity">
@@ -64,15 +64,26 @@ export default function Navbar() {
               {navLinks.map((link) =>
                 link.hasDropdown ? (
                   <NavigationMenuItem key={link.name}>
-                    <NavigationMenuTrigger 
-                      className={cn(
-                        "bg-transparent hover:bg-transparent hover:text-primary text-sm font-normal px-2 sm:px-4",
-                        isActive(link.href) && "text-primary"
-                      )}
-                    >
-                      <span className="hidden sm:inline">{link.name}</span>
-                      <span className="sm:hidden">Solutions</span>
-                    </NavigationMenuTrigger>
+                    <div className="flex items-center">
+                      <Link
+                        to={link.href}
+                        className={cn(
+                          "inline-flex h-10 items-center justify-center px-2 sm:px-3 py-2 text-xs sm:text-sm font-normal transition-colors hover:text-primary whitespace-nowrap",
+                          isActive(link.href) && "text-primary"
+                        )}
+                      >
+                        <span className="hidden sm:inline">{link.name}</span>
+                        <span className="sm:hidden">Solutions</span>
+                      </Link>
+                      <NavigationMenuTrigger 
+                        className={cn(
+                          "bg-transparent hover:bg-transparent hover:text-primary text-sm font-normal px-0 sm:px-1 h-10",
+                          isActive(link.href) && "text-primary"
+                        )}
+                      >
+                        <span className="sr-only">Open solutions menu</span>
+                      </NavigationMenuTrigger>
+                    </div>
                     <NavigationMenuContent>
                       <ul className="w-[280px] p-2 bg-popover border border-border rounded-lg shadow-lg">
                         {solutions.map((solution) => (
