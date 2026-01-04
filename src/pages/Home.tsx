@@ -3,7 +3,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ChevronDown, Shield, Rocket, Leaf, CheckCircle } from "lucide-react";
 import logo from "@/assets/ConsenTerra_Logo.png";
-import heroBackground from "@/assets/hero-background.png";
+
 import RotatingHeadlinePhrase from "@/components/RotatingHeadlinePhrase";
 
 const solutions = [
@@ -59,16 +59,8 @@ export default function Home() {
 
   return (
     <div className="flex flex-col">
-      {/* Hero Section with background image */}
-      <section 
-        className="min-h-[90vh] relative overflow-hidden"
-        style={{
-          backgroundImage: `url(${heroBackground})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
-      >
+      {/* Hero Section */}
+      <section className="min-h-[90vh] relative overflow-hidden">
         <div className="section-container h-full py-8 lg:py-12">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center min-h-[80vh] animate-fade-in-up">
             {/* Left Side - Large Logo */}
