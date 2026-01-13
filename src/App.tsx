@@ -11,6 +11,7 @@ import Solutions from "./pages/Solutions";
 import PriXplainer from "./pages/solutions/PriXplainer";
 import FoundrFATE from "./pages/solutions/FoundrFATE";
 import TrustEarthy from "./pages/solutions/TrustEarthy";
+import Extension from "./pages/Extension";
 import Privacy from "./pages/Privacy";
 import Career from "./pages/Career";
 import Contact from "./pages/Contact";
@@ -35,6 +36,7 @@ const App = () => (
               <Route path="/solutions/prixplainer" element={<PriXplainer />} />
               <Route path="/solutions/foundrfate" element={<FoundrFATE />} />
               <Route path="/solutions/trusteartthy" element={<TrustEarthy />} />
+              <Route path="/extension" element={<Extension />} />
               <Route path="/privacy" element={<Privacy />} />
               <Route path="/career" element={<Career />} />
               <Route path="/contact" element={<Contact />} />
