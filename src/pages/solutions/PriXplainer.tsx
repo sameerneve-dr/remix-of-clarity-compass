@@ -6,26 +6,47 @@ import DemoCarousel from "@/components/DemoCarousel";
 import AuroraBackground from "@/components/AuroraBackground";
 import AnimatedSection from "@/components/AnimatedSection";
 import GlowCard from "@/components/GlowCard";
+import WebsiteRiskScan from "@/components/scan/WebsiteRiskScan";
 
 const demoSlides = [
   {
     title: "Paste Any Privacy Policy",
     description: "Simply paste the URL or text of any privacy policy or terms of service. PriXplainer works with policies from any website or app.",
+    bullets: [
+      "Works with any website or app policy",
+      "Supports URLs or direct text paste",
+      "Handles policies of any length"
+    ],
     highlight: "Works with policies from Google, Facebook, Instagram, and thousands of other services."
   },
   {
     title: "AI-Powered Analysis",
     description: "Our advanced AI engine reads and analyzes the entire document, identifying key clauses about data collection, sharing, and your rights.",
+    bullets: [
+      "Identifies data collection practices",
+      "Flags third-party sharing",
+      "Highlights your rights and opt-outs"
+    ],
     highlight: "Powered by privacy-focused ontologies developed by legal and privacy experts."
   },
   {
     title: "See Risk Indicators",
     description: "Visual severity indicators highlight concerning practices at a glance. Red flags for high-risk clauses, yellow for moderate concerns, and green for user-friendly terms.",
+    bullets: [
+      "🔴 High-risk clauses flagged in red",
+      "🟡 Moderate concerns in yellow",
+      "🟢 User-friendly terms in green"
+    ],
     highlight: "Each risk is explained in plain language so you understand exactly what it means for you."
   },
   {
     title: "Get Your Summary",
     description: "Receive a clear, human-readable summary of what the policy actually says about your data. No more legal jargon—just the facts you need to make informed decisions.",
+    bullets: [
+      "Plain-language explanations",
+      "Key points highlighted",
+      "Actionable recommendations"
+    ],
     highlight: "Typical 18-minute read condensed to 2 minutes of actionable insights."
   }
 ];
@@ -108,7 +129,31 @@ export default function PriXplainer() {
         </div>
       </section>
 
-      <DemoCarousel slides={demoSlides} title="See PriXplainer in Action" subtitle="Discover how PriXplainer transforms complex privacy policies into clear, actionable insights." />
+      <DemoCarousel 
+        slides={demoSlides} 
+        title="See PriXplainer in Action" 
+        subtitle="Discover how PriXplainer transforms complex privacy policies into clear, actionable insights." 
+      />
+
+      {/* Website Risk Scan Tool */}
+      <WebsiteRiskScan />
+
+      {/* Extension CTA */}
+      <AnimatedSection className="py-16">
+        <div className="section-container">
+          <GlowCard className="max-w-3xl mx-auto p-8 text-center">
+            <h3 className="text-2xl font-bold text-foreground mb-3">Coming Soon: Browser Extension</h3>
+            <p className="text-muted-foreground mb-6">
+              Get instant privacy insights on any website you visit. See risk scores before you click "Accept".
+            </p>
+            <Button asChild variant="glow">
+              <Link to="/extension">
+                Learn More & Join Waitlist <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
+          </GlowCard>
+        </div>
+      </AnimatedSection>
 
       {/* CTA */}
       <AnimatedSection className="py-16">
