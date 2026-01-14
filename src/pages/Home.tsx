@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Shield, Rocket, Leaf, CheckCircle, Sparkles } from "lucide-react";
+import { ChevronDown, Shield, Rocket, Leaf, CheckCircle, Sparkles, Download, Chrome, Settings, Puzzle } from "lucide-react";
 import logo from "@/assets/ConsenTerra_Logo.png";
 import AuroraBackground from "@/components/AuroraBackground";
 import AnimatedSection from "@/components/AnimatedSection";
@@ -279,6 +279,125 @@ export default function Home() {
               </AnimatedSection>
             </div>
           </AnimatedSection>
+        </div>
+      </section>
+
+      {/* Chrome Extension Section */}
+      <section className="py-20 lg:py-28 relative overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
+        <div className="section-container relative z-10">
+          <AnimatedSection className="text-center mb-12">
+            <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 mb-6">
+              <Chrome className="h-4 w-4 text-primary" />
+              <span className="text-sm text-primary font-medium">Browser Extension</span>
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-foreground mb-4">
+              Get the <span className="text-gradient">PriXplainer Extension</span>
+            </h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Scan any website's privacy policy instantly with our Chrome extension. Get AI-powered risk analysis right in your browser.
+            </p>
+          </AnimatedSection>
+
+          <div className="grid lg:grid-cols-2 gap-12 items-center max-w-5xl mx-auto">
+            {/* Left - Extension Preview */}
+            <AnimatedSection delay={0.1}>
+              <GlowCard className="p-8 relative overflow-hidden">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+                <div className="relative">
+                  <div className="flex items-center gap-3 mb-6">
+                    <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center">
+                      <Shield className="h-6 w-6 text-primary" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-semibold text-foreground">PriXplainer</h3>
+                      <p className="text-sm text-muted-foreground">Privacy Policy Scanner</p>
+                    </div>
+                  </div>
+                  <div className="space-y-3 mb-6">
+                    {[
+                      "One-click privacy policy analysis",
+                      "Real-time risk scoring",
+                      "AI-powered summaries",
+                      "Works on any website"
+                    ].map((feature) => (
+                      <div key={feature} className="flex items-center gap-3">
+                        <CheckCircle className="h-4 w-4 text-primary flex-shrink-0" />
+                        <span className="text-sm text-muted-foreground">{feature}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <div className="flex items-center gap-2 text-xs text-muted-foreground/60">
+                    <Puzzle className="h-3 w-3" />
+                    <span>Free Chrome Extension</span>
+                  </div>
+                </div>
+              </GlowCard>
+            </AnimatedSection>
+
+            {/* Right - Installation Steps */}
+            <AnimatedSection delay={0.2}>
+              <div className="space-y-6">
+                <h3 className="text-xl font-semibold text-foreground mb-6">
+                  How to Install (Developer Mode)
+                </h3>
+                
+                {[
+                  {
+                    step: 1,
+                    title: "Download the extension",
+                    description: "Download the extension files from our repository or contact us for the latest version."
+                  },
+                  {
+                    step: 2,
+                    title: "Open Chrome Extensions",
+                    description: "Navigate to chrome://extensions/ in your Chrome browser."
+                  },
+                  {
+                    step: 3,
+                    title: "Enable Developer Mode",
+                    description: "Toggle on 'Developer mode' in the top-right corner of the extensions page."
+                  },
+                  {
+                    step: 4,
+                    title: "Load the extension",
+                    description: "Click 'Load unpacked' and select the browser-extension folder."
+                  },
+                  {
+                    step: 5,
+                    title: "Pin & Use",
+                    description: "Pin the extension to your toolbar and click it on any website to scan!"
+                  }
+                ].map((item, index) => (
+                  <motion.div
+                    key={item.step}
+                    className="flex gap-4"
+                    initial={{ opacity: 0, x: 20 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ duration: 0.4, delay: index * 0.1 }}
+                    viewport={{ once: true }}
+                  >
+                    <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-semibold text-sm">
+                      {item.step}
+                    </div>
+                    <div>
+                      <h4 className="font-medium text-foreground mb-1">{item.title}</h4>
+                      <p className="text-sm text-muted-foreground">{item.description}</p>
+                    </div>
+                  </motion.div>
+                ))}
+
+                <div className="pt-4">
+                  <Link to="/extension">
+                    <Button variant="glow" className="rounded-full px-6">
+                      <Download className="h-4 w-4 mr-2" />
+                      View Extension Details
+                    </Button>
+                  </Link>
+                </div>
+              </div>
+            </AnimatedSection>
+          </div>
         </div>
       </section>
 
