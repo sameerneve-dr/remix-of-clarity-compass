@@ -1,19 +1,33 @@
 import { Link } from "react-router-dom";
-import { Briefcase, MapPin, Clock, ArrowRight, CheckCircle } from "lucide-react";
+import { Briefcase, MapPin, Clock, ArrowRight, CheckCircle, Code } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-const responsibilities = [
+const designResponsibilities = [
   "Brand design & visual assets creation",
   "Website & campaign design",
   "Social media planning and content creation",
   "Competitor analysis and market research",
 ];
 
-const skills = [
+const designSkills = [
   "Canva, Adobe Creative Suite, MS Office",
   "AI/LLM tools for content creation",
   "Website development basics",
   "Creative strategy and ideation",
+];
+
+const sweResponsibilities = [
+  "Develop and maintain web applications using React and TypeScript",
+  "Build and integrate APIs and backend services",
+  "Collaborate on AI-powered feature development",
+  "Write clean, tested, and documented code",
+];
+
+const sweSkills = [
+  "React, TypeScript, JavaScript",
+  "REST APIs and database fundamentals",
+  "Git version control",
+  "Problem-solving and debugging skills",
 ];
 
 const benefits = [
@@ -91,7 +105,7 @@ export default function Career() {
                 <div>
                   <h3 className="font-semibold text-foreground mb-3">Responsibilities</h3>
                   <ul className="space-y-2">
-                    {responsibilities.map((item) => (
+                    {designResponsibilities.map((item) => (
                       <li key={item} className="flex gap-2 text-sm text-muted-foreground">
                         <CheckCircle className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
                         {item}
@@ -104,7 +118,80 @@ export default function Career() {
                 <div>
                   <h3 className="font-semibold text-foreground mb-3">Skills Required</h3>
                   <ul className="space-y-2">
-                    {skills.map((item) => (
+                    {designSkills.map((item) => (
+                      <li key={item} className="flex gap-2 text-sm text-muted-foreground">
+                        <CheckCircle className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Benefits */}
+                <div>
+                  <h3 className="font-semibold text-foreground mb-3">What's In It For You</h3>
+                  <ul className="space-y-2">
+                    {benefits.map((item) => (
+                      <li key={item} className="flex gap-2 text-sm text-muted-foreground">
+                        <CheckCircle className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            </div>
+
+            {/* Software Engineering Intern Role */}
+            <div className="bg-background rounded-2xl border border-border p-8 mb-8">
+              <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <div className="inline-flex items-center justify-center w-8 h-8 rounded-lg bg-blue-500/10 text-blue-500">
+                      <Code className="h-4 w-4" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-foreground">
+                      Software Engineering Intern
+                    </h2>
+                  </div>
+                  <div className="flex flex-wrap gap-4 text-sm text-muted-foreground">
+                    <span className="flex items-center gap-1.5">
+                      <MapPin className="h-4 w-4" />
+                      100% Remote
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                      <Clock className="h-4 w-4" />
+                      Jan 2026 – May 2026
+                    </span>
+                  </div>
+                </div>
+                <Button asChild>
+                  <Link to="/contact">
+                    Apply Now
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Link>
+                </Button>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8">
+                {/* Responsibilities */}
+                <div>
+                  <h3 className="font-semibold text-foreground mb-3">Responsibilities</h3>
+                  <ul className="space-y-2">
+                    {sweResponsibilities.map((item) => (
+                      <li key={item} className="flex gap-2 text-sm text-muted-foreground">
+                        <CheckCircle className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                {/* Skills */}
+                <div>
+                  <h3 className="font-semibold text-foreground mb-3">Skills Required</h3>
+                  <ul className="space-y-2">
+                    {sweSkills.map((item) => (
                       <li key={item} className="flex gap-2 text-sm text-muted-foreground">
                         <CheckCircle className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
                         {item}
