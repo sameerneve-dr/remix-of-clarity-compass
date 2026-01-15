@@ -71,6 +71,39 @@ export type Database = {
         }
         Relationships: []
       }
+      scan_history: {
+        Row: {
+          findings: Json | null
+          id: string
+          risk_level: string
+          risk_score: number
+          scanned_at: string
+          summary: string | null
+          url: string
+          user_id: string
+        }
+        Insert: {
+          findings?: Json | null
+          id?: string
+          risk_level: string
+          risk_score: number
+          scanned_at?: string
+          summary?: string | null
+          url: string
+          user_id: string
+        }
+        Update: {
+          findings?: Json | null
+          id?: string
+          risk_level?: string
+          risk_score?: number
+          scanned_at?: string
+          summary?: string | null
+          url?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
