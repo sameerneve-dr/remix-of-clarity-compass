@@ -7,6 +7,7 @@ import AuroraBackground from "@/components/AuroraBackground";
 import AnimatedSection from "@/components/AnimatedSection";
 import GlowCard from "@/components/GlowCard";
 import WebsiteRiskScan from "@/components/scan/WebsiteRiskScan";
+import ScanHistory from "@/components/scan/ScanHistory";
 
 const demoSlides = [
   {
@@ -137,6 +138,11 @@ export default function PriXplainer() {
 
       {/* Website Risk Scan Tool */}
       <WebsiteRiskScan />
+      
+      {/* Scan History for logged-in users */}
+      <div className="section-container">
+        <ScanHistory />
+      </div>
 
       {/* Extension CTA */}
       <AnimatedSection className="py-16">
