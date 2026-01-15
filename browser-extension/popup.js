@@ -1,6 +1,6 @@
 // PriXplainer Chrome Extension
 // API endpoint for the website scan function
-const API_URL = 'https://hclsesnrhxvbxbnhxery.supabase.co/functions/v1/website-scan';
+const API_URL = 'https://gijcgculokmkbjlxstxx.supabase.co/functions/v1/website-scan';
 
 let currentDomain = '';
 let scanResult = null;
@@ -44,6 +44,12 @@ retryBtn.addEventListener('click', () => performScan());
 scanAnotherBtn.addEventListener('click', () => showState('idle'));
 copyBtn.addEventListener('click', () => copyReport());
 
+// Toggle expandable section
+window.toggleExpandable = function() {
+  const section = document.getElementById('confidence-section');
+  section.classList.toggle('open');
+};
+
 // Show different states
 function showState(state) {
   idleState.style.display = state === 'idle' ? 'block' : 'none';
@@ -63,6 +69,7 @@ async function performScan() {
     'Checking data collection policies...',
     'Scanning for dark patterns...',
     'Evaluating tracking technologies...',
+    'Assessing digital footprint...',
     'Generating risk assessment...'
   ];
 
@@ -101,9 +108,12 @@ async function performScan() {
 
 // Display scan results
 function displayResults(result) {
+  // Domain
+  document.getElementById('result-domain').textContent = result.domain;
+
   // Trust Score
   const trustScoreEl = document.getElementById('trust-score');
-  trustScoreEl.textContent = result.score;
+  trustScoreEl.innerHTML = `${result.score}<span>/100</span>`;
   trustScoreEl.className = 'score-value';
   if (result.score >= 70) {
     trustScoreEl.classList.add('high');
@@ -121,11 +131,11 @@ function displayResults(result) {
   // Summary
   document.getElementById('summary').textContent = result.summary;
 
-  // Risks
+  // Immediate Risks
   const risksList = document.getElementById('risks-list');
   risksList.innerHTML = '';
   if (result.immediate_risks && result.immediate_risks.length > 0) {
-    result.immediate_risks.slice(0, 4).forEach(risk => {
+    result.immediate_risks.forEach(risk => {
       const riskItem = document.createElement('div');
       riskItem.className = 'risk-item';
       const icon = getSeverityIcon(risk.severity);
@@ -146,23 +156,96 @@ function displayResults(result) {
   darkPatternsList.innerHTML = '';
   
   if (result.dark_patterns && result.dark_patterns.detected && result.dark_patterns.items.length > 0) {
-    result.dark_patterns.items.slice(0, 3).forEach(pattern => {
+    result.dark_patterns.items.forEach(pattern => {
       const patternItem = document.createElement('div');
-      patternItem.className = 'risk-item';
+      patternItem.className = 'dark-pattern-item';
       patternItem.innerHTML = `
-        <span class="risk-icon">🎭</span>
-        <span><strong>${pattern.type}:</strong> ${pattern.evidence}</span>
+        <div class="dark-pattern-type">${pattern.type}</div>
+        <div class="dark-pattern-evidence">${pattern.evidence}</div>
       `;
       darkPatternsList.appendChild(patternItem);
     });
     darkPatternsSection.style.display = 'block';
   } else {
-    darkPatternsSection.style.display = 'none';
+    darkPatternsList.innerHTML = `
+      <div class="no-dark-patterns">
+        <span>✅</span>
+        <span>No obvious dark patterns detected</span>
+      </div>
+    `;
+    darkPatternsSection.style.display = 'block';
   }
 
-  // Confidence note
-  document.getElementById('confidence-note').textContent = 
-    `Analysis confidence: ${result.confidence}`;
+  // Digital Footprint
+  const footprintSection = document.getElementById('footprint-section');
+  const footprintChips = document.getElementById('footprint-chips');
+  const footprintDetails = document.getElementById('footprint-details');
+  const footprintNoteText = document.getElementById('footprint-note-text');
+
+  footprintChips.innerHTML = '';
+  footprintDetails.innerHTML = '';
+
+  if (result.digital_footprint) {
+    // Chips
+    if (result.digital_footprint.chips && result.digital_footprint.chips.length > 0) {
+      result.digital_footprint.chips.forEach(chip => {
+        const chipEl = document.createElement('span');
+        chipEl.className = 'chip';
+        chipEl.textContent = chip;
+        footprintChips.appendChild(chipEl);
+      });
+    }
+
+    // Details
+    if (result.digital_footprint.details && result.digital_footprint.details.length > 0) {
+      result.digital_footprint.details.forEach(detail => {
+        const detailEl = document.createElement('div');
+        detailEl.className = 'footprint-detail';
+        detailEl.innerHTML = `
+          <div class="footprint-label">${detail.label}</div>
+          <div class="footprint-text">${detail.text}</div>
+        `;
+        footprintDetails.appendChild(detailEl);
+      });
+    }
+
+    // Note
+    if (result.digital_footprint.note) {
+      footprintNoteText.textContent = result.digital_footprint.note;
+      document.getElementById('footprint-note').style.display = 'flex';
+    } else {
+      document.getElementById('footprint-note').style.display = 'none';
+    }
+
+    footprintSection.style.display = 'block';
+  } else {
+    footprintSection.style.display = 'none';
+  }
+
+  // What You Can Do (Actions)
+  const actionsSection = document.getElementById('actions-section');
+  const actionsList = document.getElementById('actions-list');
+  actionsList.innerHTML = '';
+
+  if (result.actions && result.actions.length > 0) {
+    result.actions.forEach(action => {
+      const actionCard = document.createElement('div');
+      actionCard.className = 'action-card';
+      actionCard.innerHTML = `
+        <div class="action-title">${action.title}</div>
+        <div class="action-text">${action.text}</div>
+      `;
+      actionsList.appendChild(actionCard);
+    });
+    actionsSection.style.display = 'block';
+  } else {
+    actionsSection.style.display = 'none';
+  }
+
+  // Confidence
+  const confidenceBadge = document.getElementById('confidence-badge');
+  confidenceBadge.textContent = result.confidence;
+  confidenceBadge.className = 'confidence-badge ' + (result.confidence || 'medium').toLowerCase();
 }
 
 // Get icon based on severity
@@ -179,22 +262,31 @@ function getSeverityIcon(severity) {
 async function copyReport() {
   if (!scanResult) return;
 
+  const digitalFootprintSection = scanResult.digital_footprint ? `
+Digital Footprint:
+Data Types: ${scanResult.digital_footprint.chips.join(', ')}
+${scanResult.digital_footprint.details.map(d => `• ${d.label}: ${d.text}`).join('\n')}
+
+Note: ${scanResult.digital_footprint.note}
+` : '';
+
   const report = `
 PriXplainer Privacy Report
 ===========================
 Website: ${scanResult.domain}
 Trust Score: ${scanResult.score}/100
 Risk Level: ${scanResult.risk_level}
+Confidence: ${scanResult.confidence}
 
 Summary:
 ${scanResult.summary}
 
-Key Risks:
-${scanResult.immediate_risks.map(r => `• ${r.text}`).join('\n')}
+Immediate Risks:
+${scanResult.immediate_risks.map(r => `${getSeverityIcon(r.severity)} ${r.text}`).join('\n')}
 
 ${scanResult.dark_patterns.detected ? `Dark Patterns Detected:
-${scanResult.dark_patterns.items.map(p => `• ${p.type}: ${p.evidence}`).join('\n')}` : ''}
-
+${scanResult.dark_patterns.items.map(p => `• ${p.type}: ${p.evidence}`).join('\n')}` : 'No Dark Patterns Detected ✅'}
+${digitalFootprintSection}
 Recommended Actions:
 ${scanResult.actions.map(a => `• ${a.title}: ${a.text}`).join('\n')}
 
@@ -204,10 +296,10 @@ Generated by PriXplainer - https://consenterra.lovable.app
 
   try {
     await navigator.clipboard.writeText(report);
-    const originalText = copyBtn.textContent;
-    copyBtn.textContent = 'Copied!';
+    const originalText = copyBtn.innerHTML;
+    copyBtn.innerHTML = '✅ Copied!';
     setTimeout(() => {
-      copyBtn.textContent = originalText;
+      copyBtn.innerHTML = originalText;
     }, 2000);
   } catch (error) {
     console.error('Failed to copy:', error);
