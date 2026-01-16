@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
-import { ChevronDown, Shield, Rocket, Leaf, CheckCircle, Sparkles } from "lucide-react";
+import { ChevronDown, Shield, Rocket, Leaf, CheckCircle, Sparkles, ArrowRight, Chrome } from "lucide-react";
 import logo from "@/assets/ConsenTerra_Logo.png";
 import AuroraBackground from "@/components/AuroraBackground";
 import AnimatedSection from "@/components/AnimatedSection";
@@ -282,6 +282,52 @@ export default function Home() {
         </div>
       </section>
 
+
+      {/* PriXplainer CTA */}
+      <section className="py-16 relative overflow-hidden">
+        <div className="section-container">
+          <AnimatedSection>
+            <div className="max-w-4xl mx-auto">
+              <GlowCard className="p-8 md:p-10">
+                <div className="flex flex-col md:flex-row items-center gap-6 md:gap-8">
+                  <div className="flex-shrink-0">
+                    <motion.div
+                      className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary/20"
+                      whileHover={{ scale: 1.1, rotate: 5 }}
+                      style={{ boxShadow: "0 0 40px hsl(270 80% 60% / 0.3)" }}
+                    >
+                      <Shield className="h-8 w-8 text-primary" />
+                    </motion.div>
+                  </div>
+                  <div className="flex-1 text-center md:text-left">
+                    <h3 className="text-xl md:text-2xl font-bold text-foreground mb-2">
+                      Scan any website for privacy risks
+                    </h3>
+                    <p className="text-muted-foreground mb-0">
+                      PriXplainer uses AI to decode privacy policies and reveal hidden data practices. 
+                      Try it free on the web or get notified when our Chrome extension launches.
+                    </p>
+                  </div>
+                  <div className="flex flex-col sm:flex-row gap-3 flex-shrink-0">
+                    <Button asChild variant="glow" size="lg" className="gap-2">
+                      <Link to="/solutions/prixplainer">
+                        Try Free Scan
+                        <ArrowRight className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                    <Button asChild variant="outline" size="lg" className="gap-2">
+                      <Link to="/extension">
+                        <Chrome className="h-4 w-4" />
+                        Extension
+                      </Link>
+                    </Button>
+                  </div>
+                </div>
+              </GlowCard>
+            </div>
+          </AnimatedSection>
+        </div>
+      </section>
 
       {/* Features/Values Section */}
       <section className="py-20 relative overflow-hidden">
