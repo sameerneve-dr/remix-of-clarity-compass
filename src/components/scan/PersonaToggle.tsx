@@ -12,6 +12,7 @@ export type PersonaType = 'everyday' | 'privacy' | 'business';
 interface PersonaToggleProps {
   value: PersonaType;
   onChange: (persona: PersonaType) => void;
+  disabled?: boolean;
 }
 
 const personas = [
@@ -35,11 +36,11 @@ const personas = [
   },
 ];
 
-export default function PersonaToggle({ value, onChange }: PersonaToggleProps) {
+export default function PersonaToggle({ value, onChange, disabled }: PersonaToggleProps) {
   return (
     <div className="flex items-center gap-2">
       <span className="text-sm text-muted-foreground mr-2">View as:</span>
-      <div className="flex items-center gap-1 p-1 rounded-lg bg-muted/50 border border-border/50">
+      <div className={`flex items-center gap-1 p-1 rounded-lg bg-muted/50 border border-border/50 ${disabled ? 'opacity-60' : ''}`}>
         {personas.map((persona) => {
           const Icon = persona.icon;
           const isActive = value === persona.id;
@@ -48,8 +49,10 @@ export default function PersonaToggle({ value, onChange }: PersonaToggleProps) {
             <Tooltip key={persona.id}>
               <TooltipTrigger asChild>
                 <button
-                  onClick={() => onChange(persona.id)}
+                  onClick={() => !disabled && onChange(persona.id)}
+                  disabled={disabled}
                   className={`relative flex items-center gap-1.5 px-3 py-1.5 rounded-md text-sm font-medium transition-all ${
+                    disabled ? 'cursor-not-allowed' :
                     isActive 
                       ? 'text-primary' 
                       : 'text-muted-foreground hover:text-foreground'
