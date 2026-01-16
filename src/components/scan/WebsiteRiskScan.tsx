@@ -14,6 +14,7 @@ import PaywallDialog from "@/components/PaywallDialog";
 import GuestLimitModal from "@/components/GuestLimitModal";
 import type { ScanResult, ScanStatus } from "@/types/scan";
 import type { Json } from "@/integrations/supabase/types";
+import type { PersonaType } from "./PersonaToggle";
 
 export default function WebsiteRiskScan() {
   const { user } = useAuth();
@@ -24,6 +25,7 @@ export default function WebsiteRiskScan() {
   const [result, setResult] = useState<ScanResult | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
   const [showGuestLimit, setShowGuestLimit] = useState(false);
+  const [currentPersona, setCurrentPersona] = useState<PersonaType>('everyday');
 
   const saveScanToHistory = async (scanResult: ScanResult) => {
     if (!user) return;
@@ -79,8 +81,11 @@ export default function WebsiteRiskScan() {
       const progressTimer1 = setTimeout(() => setProgressStep(1), 1500);
       const progressTimer2 = setTimeout(() => setProgressStep(2), 3000);
 
-      // Include guest usage token for backend validation
-      const requestBody: { url: string; guest_token?: string } = { url };
+      // Include guest usage token and persona for backend
+      const requestBody: { url: string; guest_token?: string; persona: PersonaType } = { 
+        url,
+        persona: currentPersona
+      };
       if (!user) {
         requestBody.guest_token = getUsageToken();
       }
@@ -194,7 +199,13 @@ export default function WebsiteRiskScan() {
             )}
             
             {status === 'complete' && result && (
-              <ScanResults key="results" result={result} onScanAnother={handleScanAnother} />
+              <ScanResults 
+                key="results" 
+                result={result} 
+                onScanAnother={handleScanAnother}
+                persona={currentPersona}
+                onPersonaChange={setCurrentPersona}
+              />
             )}
             
             {status === 'error' && (

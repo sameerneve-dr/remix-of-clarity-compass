@@ -37,7 +37,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { url, guest_token } = body;
+    const { url, guest_token, persona = 'everyday' } = body;
     
     if (!url) {
       return new Response(
@@ -86,7 +86,36 @@ serve(async (req) => {
       throw new Error("LOVABLE_API_KEY is not configured");
     }
 
+    // Persona-specific language adjustments
+    const personaInstructions = {
+      everyday: `
+Language style: Simple, friendly, non-technical
+- Use everyday analogies (e.g., "like leaving your front door unlocked")
+- Avoid jargon completely
+- Focus on practical impacts ("what this means for you")
+- Keep explanations brief and actionable
+- Use reassuring tone for low risks, clear warnings for high risks`,
+      privacy: `
+Language style: Technical, detailed, comprehensive
+- Include technical details (cookie types, tracking methods, data retention periods)
+- Reference specific regulations (GDPR, CCPA, ePrivacy)
+- Explain the "how" and "why" behind each finding
+- Include privacy-enhancing recommendations (browser extensions, settings)
+- Be thorough about potential data flows and third-party sharing`,
+      business: `
+Language style: Professional, compliance-focused, risk-oriented
+- Frame findings in terms of business/legal liability
+- Reference regulatory frameworks and potential penalties
+- Highlight competitive positioning implications
+- Focus on compliance gaps and remediation priorities
+- Include considerations for customer trust and reputation`
+    };
+
+    const personaContext = personaInstructions[persona as keyof typeof personaInstructions] || personaInstructions.everyday;
+
     const systemPrompt = `You are a privacy and security analyst for websites. Given a website domain, analyze typical privacy practices for that type of site and provide a comprehensive risk assessment.
+
+${personaContext}
 
 You MUST return a valid JSON object with this exact structure:
 {
@@ -113,8 +142,8 @@ You MUST return a valid JSON object with this exact structure:
 }
 
 Guidelines:
-- Be non-legal, use plain English
-- Avoid scary language unless risk is truly high
+- Adapt language and detail level based on the persona instructions above
+- Be non-legal, but match technical depth to persona
 - Clearly label uncertainty and inference
 - Provide 3-6 immediate risks
 - Provide 3-5 actionable steps
