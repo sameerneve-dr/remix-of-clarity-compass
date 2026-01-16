@@ -23,6 +23,8 @@ import UpgradePrompt from "./UpgradePrompt";
 interface ScanResultsProps {
   result: ScanResult;
   onScanAnother: () => void;
+  persona: PersonaType;
+  onPersonaChange: (persona: PersonaType) => void;
 }
 
 const getRiskLevelColor = (level: string) => {
@@ -40,9 +42,8 @@ const getScoreColor = (score: number) => {
   return 'text-red-400';
 };
 
-export default function ScanResults({ result, onScanAnother }: ScanResultsProps) {
+export default function ScanResults({ result, onScanAnother, persona, onPersonaChange }: ScanResultsProps) {
   const { user } = useAuth();
-  const [persona, setPersona] = useState<PersonaType>('everyday');
   const riskColors = getRiskLevelColor(result.risk_level);
 
   const handleCopySummary = async () => {
@@ -73,7 +74,7 @@ ${result.actions.map(a => `• ${a.title}: ${a.text}`).join('\n')}
     >
       {/* Persona Toggle & Confidence */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <PersonaToggle value={persona} onChange={setPersona} />
+        <PersonaToggle value={persona} onChange={onPersonaChange} />
         <ConfidenceMeter level={result.confidence} />
       </div>
 

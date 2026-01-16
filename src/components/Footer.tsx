@@ -16,6 +16,7 @@ const footerLinks = {
   product: [
     { name: "Roadmap", href: "/roadmap" },
     { name: "Changelog", href: "/changelog" },
+    { name: "Research", href: "/research" },
     { name: "Responsible AI", href: "/about#responsible-ai" },
   ],
   solutions: [
