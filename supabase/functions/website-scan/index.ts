@@ -1,8 +1,33 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const MAX_GUEST_USES = 2;
+
+// Validate guest usage token
+const validateGuestToken = (token: string | undefined): { valid: boolean; count: number } => {
+  if (!token) {
+    return { valid: true, count: 0 }; // No token means first-time or authenticated user
+  }
+  
+  try {
+    const decoded = JSON.parse(atob(token));
+    const count = decoded.count || 0;
+    
+    // Check if usage count is within limit
+    if (count >= MAX_GUEST_USES) {
+      return { valid: false, count };
+    }
+    
+    return { valid: true, count };
+  } catch {
+    // Invalid token format - allow but treat as 0 uses
+    return { valid: true, count: 0 };
+  }
 };
 
 serve(async (req) => {
@@ -11,13 +36,45 @@ serve(async (req) => {
   }
 
   try {
-    const { url } = await req.json();
+    const body = await req.json();
+    const { url, guest_token } = body;
     
     if (!url) {
       return new Response(
         JSON.stringify({ error: "URL is required" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
+    }
+
+    // Check if this is an authenticated request
+    const authHeader = req.headers.get("authorization");
+    let isAuthenticated = false;
+    
+    if (authHeader) {
+      const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+      const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
+      const supabase = createClient(supabaseUrl, supabaseKey, {
+        global: { headers: { Authorization: authHeader } },
+      });
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      isAuthenticated = !!user;
+    }
+
+    // For unauthenticated users, validate guest token
+    if (!isAuthenticated) {
+      const { valid, count } = validateGuestToken(guest_token);
+      
+      if (!valid) {
+        console.log(`Guest limit exceeded. Count: ${count}`);
+        return new Response(
+          JSON.stringify({ 
+            error: "guest_limit_exceeded",
+            message: "You've used your 2 free analyses. Please sign up to continue."
+          }),
+          { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
     }
 
     // Normalize the URL/domain
