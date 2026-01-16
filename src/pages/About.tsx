@@ -56,23 +56,107 @@ export default function About() {
         </div>
       </section>
 
-      {/* Golden Circle */}
-      <section className="py-20">
+      {/* Golden Circle - Concentric Circles Design */}
+      <section className="py-20 lg:py-28">
         <div className="section-container">
-          <AnimatedSection className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-foreground">Start With <span className="text-gradient">Why</span></h2>
+          <AnimatedSection className="text-center mb-12 sm:mb-16">
+            <h2 className="text-2xl sm:text-3xl font-bold text-foreground">Start With <span className="text-gradient">Why</span></h2>
           </AnimatedSection>
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              { title: "Why", desc: "In today's world, understanding is power. We believe everyone deserves to understand what they invest their time, money, data, and trust in.", primary: true },
-              { title: "How", desc: "Our solutions translate dense information into insight, context, and confidence." },
-              { title: "What", desc: "We create AI-powered solutions to solve everyday problems." },
-            ].map((item, i) => (
-              <GlowCard key={item.title} delay={i * 0.15} className={`p-6 ${item.primary ? "border-primary/50" : ""}`}>
-                <h3 className={`text-xl font-bold mb-3 ${item.primary ? "text-primary" : "text-foreground"}`}>{item.title}</h3>
-                <p className="text-muted-foreground leading-relaxed">{item.desc}</p>
-              </GlowCard>
-            ))}
+          
+          <div className="flex justify-center items-center">
+            <div className="relative w-[320px] h-[320px] sm:w-[450px] sm:h-[450px] lg:w-[550px] lg:h-[550px]">
+              {/* Outer Circle - What */}
+              <motion.div
+                className="absolute inset-0 rounded-full border-2 border-border/50 flex items-start justify-center pt-6 sm:pt-10"
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                style={{
+                  background: 'radial-gradient(circle at center, transparent 60%, hsl(var(--muted) / 0.1) 100%)',
+                }}
+              >
+                <div className="text-center px-4 max-w-[280px] sm:max-w-xs">
+                  <h3 className="text-base sm:text-lg font-bold text-muted-foreground mb-1">What</h3>
+                  <p className="text-xs sm:text-sm text-muted-foreground/80 leading-relaxed">
+                    We create AI-powered solutions to solve everyday problems.
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Middle Circle - How */}
+              <motion.div
+                className="absolute rounded-full border-2 border-primary/30 flex items-start justify-center pt-4 sm:pt-6"
+                style={{
+                  top: '15%',
+                  left: '15%',
+                  right: '15%',
+                  bottom: '15%',
+                  background: 'radial-gradient(circle at center, transparent 55%, hsl(var(--primary) / 0.05) 100%)',
+                }}
+                initial={{ opacity: 0, scale: 0.8 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+              >
+                <div className="text-center px-3 max-w-[200px] sm:max-w-[240px]">
+                  <h3 className="text-base sm:text-lg font-bold text-foreground/80 mb-1">How</h3>
+                  <p className="text-[10px] sm:text-xs text-muted-foreground leading-relaxed">
+                    Our solutions translate dense information into insight, context, and confidence.
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Inner Circle - Why (Core) */}
+              <motion.div
+                className="absolute rounded-full flex items-center justify-center"
+                style={{
+                  top: '30%',
+                  left: '30%',
+                  right: '30%',
+                  bottom: '30%',
+                  background: 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--accent)) 100%)',
+                  boxShadow: '0 0 60px hsl(var(--glow-primary) / 0.4), 0 0 100px hsl(var(--glow-primary) / 0.2)',
+                }}
+                initial={{ opacity: 0, scale: 0.5 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.6, delay: 0.1 }}
+                whileHover={{ scale: 1.05 }}
+              >
+                <div className="text-center px-3 sm:px-4">
+                  <h3 className="text-lg sm:text-xl lg:text-2xl font-bold text-primary-foreground mb-1">Why</h3>
+                  <p className="text-[9px] sm:text-[10px] lg:text-xs text-primary-foreground/90 leading-relaxed">
+                    Everyone deserves to understand what they invest their time, money, data, and trust in.
+                  </p>
+                </div>
+              </motion.div>
+
+              {/* Decorative dots */}
+              {[0, 60, 120, 180, 240, 300].map((angle, i) => (
+                <motion.div
+                  key={angle}
+                  className="absolute w-2 h-2 sm:w-3 sm:h-3 rounded-full bg-primary/30"
+                  style={{
+                    top: `${50 + 48 * Math.sin((angle * Math.PI) / 180)}%`,
+                    left: `${50 + 48 * Math.cos((angle * Math.PI) / 180)}%`,
+                    transform: 'translate(-50%, -50%)',
+                  }}
+                  initial={{ opacity: 0 }}
+                  whileInView={{ opacity: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.5 + i * 0.1 }}
+                />
+              ))}
+            </div>
+          </div>
+
+          {/* Mobile-friendly text below circles */}
+          <div className="mt-10 sm:mt-12 max-w-2xl mx-auto text-center">
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed px-4">
+              In today's world, understanding is power. We believe everyone deserves to understand 
+              what they invest their time, money, data, and trust in.
+            </p>
           </div>
         </div>
       </section>
