@@ -37,7 +37,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { url, guest_token, persona = 'everyday' } = body;
+    const { url, guest_token, persona = 'everyday', is_persona_rescan = false } = body;
     
     if (!url) {
       return new Response(
@@ -62,7 +62,8 @@ serve(async (req) => {
     }
 
     // For unauthenticated users, validate guest token
-    if (!isAuthenticated) {
+    // Skip limit check for persona rescans (same URL, different perspective)
+    if (!isAuthenticated && !is_persona_rescan) {
       const { valid, count } = validateGuestToken(guest_token);
       
       if (!valid) {

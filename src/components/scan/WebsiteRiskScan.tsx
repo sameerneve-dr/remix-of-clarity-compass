@@ -67,9 +67,10 @@ export default function WebsiteRiskScan() {
     setIsRescanningPersona(true);
     
     try {
-      const requestBody: { url: string; guest_token?: string; persona: PersonaType } = { 
+      const requestBody: { url: string; guest_token?: string; persona: PersonaType; is_persona_rescan: boolean } = { 
         url: lastScannedUrl,
-        persona: newPersona
+        persona: newPersona,
+        is_persona_rescan: true // Flag to skip guest limit check for persona changes
       };
       if (!user) {
         requestBody.guest_token = getUsageToken();
