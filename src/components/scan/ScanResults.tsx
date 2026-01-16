@@ -25,6 +25,7 @@ interface ScanResultsProps {
   onScanAnother: () => void;
   persona: PersonaType;
   onPersonaChange: (persona: PersonaType) => void;
+  isLoadingPersona?: boolean;
 }
 
 const getRiskLevelColor = (level: string) => {
@@ -42,7 +43,7 @@ const getScoreColor = (score: number) => {
   return 'text-red-400';
 };
 
-export default function ScanResults({ result, onScanAnother, persona, onPersonaChange }: ScanResultsProps) {
+export default function ScanResults({ result, onScanAnother, persona, onPersonaChange, isLoadingPersona }: ScanResultsProps) {
   const { user } = useAuth();
   const riskColors = getRiskLevelColor(result.risk_level);
 
@@ -74,8 +75,13 @@ ${result.actions.map(a => `• ${a.title}: ${a.text}`).join('\n')}
     >
       {/* Persona Toggle & Confidence */}
       <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-        <PersonaToggle value={persona} onChange={onPersonaChange} />
-        <ConfidenceMeter level={result.confidence} />
+        <PersonaToggle value={persona} onChange={onPersonaChange} disabled={isLoadingPersona} />
+        <div className="flex items-center gap-3">
+          {isLoadingPersona && (
+            <span className="text-sm text-muted-foreground animate-pulse">Updating analysis...</span>
+          )}
+          <ConfidenceMeter level={result.confidence} />
+        </div>
       </div>
 
       {/* Top Summary Card */}

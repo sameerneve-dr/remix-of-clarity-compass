@@ -26,6 +26,8 @@ export default function WebsiteRiskScan() {
   const [showPaywall, setShowPaywall] = useState(false);
   const [showGuestLimit, setShowGuestLimit] = useState(false);
   const [currentPersona, setCurrentPersona] = useState<PersonaType>('everyday');
+  const [lastScannedUrl, setLastScannedUrl] = useState<string>('');
+  const [isRescanningPersona, setIsRescanningPersona] = useState(false);
 
   const saveScanToHistory = async (scanResult: ScanResult) => {
     if (!user) return;
@@ -57,7 +59,48 @@ export default function WebsiteRiskScan() {
     }
   };
 
-  const handleScan = async (url: string) => {
+  // Re-scan with different persona
+  const handlePersonaChange = async (newPersona: PersonaType) => {
+    if (newPersona === currentPersona || !lastScannedUrl) return;
+    
+    setCurrentPersona(newPersona);
+    setIsRescanningPersona(true);
+    
+    try {
+      const requestBody: { url: string; guest_token?: string; persona: PersonaType } = { 
+        url: lastScannedUrl,
+        persona: newPersona
+      };
+      if (!user) {
+        requestBody.guest_token = getUsageToken();
+      }
+
+      const { data, error } = await supabase.functions.invoke('website-scan', {
+        body: requestBody
+      });
+
+      if (error) {
+        console.error('Persona rescan error:', error);
+        toast.error("Couldn't refresh analysis. Please try again.");
+        setIsRescanningPersona(false);
+        return;
+      }
+
+      if (data && data.domain) {
+        setResult(data as ScanResult);
+        toast.success(`Analysis updated for ${newPersona === 'everyday' ? 'Everyday User' : newPersona === 'privacy' ? 'Privacy-conscious' : 'Business'} view`);
+      }
+    } catch (err) {
+      console.error('Persona rescan error:', err);
+      toast.error("Couldn't refresh analysis. Please try again.");
+    } finally {
+      setIsRescanningPersona(false);
+    }
+  };
+
+  const handleScan = async (url: string, personaOverride?: PersonaType) => {
+    const persona = personaOverride || currentPersona;
+    
     // For unauthenticated users, check guest limit
     if (!user) {
       if (!canUseAsGuest) {
@@ -75,6 +118,7 @@ export default function WebsiteRiskScan() {
     setStatus('scanning');
     setProgressStep(0);
     setResult(null);
+    setLastScannedUrl(url);
 
     try {
       // Simulate progress steps
@@ -84,7 +128,7 @@ export default function WebsiteRiskScan() {
       // Include guest usage token and persona for backend
       const requestBody: { url: string; guest_token?: string; persona: PersonaType } = { 
         url,
-        persona: currentPersona
+        persona
       };
       if (!user) {
         requestBody.guest_token = getUsageToken();
@@ -144,6 +188,7 @@ export default function WebsiteRiskScan() {
     setStatus('idle');
     setResult(null);
     setProgressStep(0);
+    setLastScannedUrl('');
   };
 
   // Determine if the scan button should be disabled
@@ -204,7 +249,8 @@ export default function WebsiteRiskScan() {
                 result={result} 
                 onScanAnother={handleScanAnother}
                 persona={currentPersona}
-                onPersonaChange={setCurrentPersona}
+                onPersonaChange={handlePersonaChange}
+                isLoadingPersona={isRescanningPersona}
               />
             )}
             
