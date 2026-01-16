@@ -5,21 +5,25 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/hooks/useAuth";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useGuestUsage } from "@/hooks/useGuestUsage";
 import AnimatedSection from "@/components/AnimatedSection";
 import ScanInput from "./ScanInput";
 import ScanProgress from "./ScanProgress";
 import ScanResults from "./ScanResults";
 import PaywallDialog from "@/components/PaywallDialog";
+import GuestLimitModal from "@/components/GuestLimitModal";
 import type { ScanResult, ScanStatus } from "@/types/scan";
 import type { Json } from "@/integrations/supabase/types";
 
 export default function WebsiteRiskScan() {
   const { user } = useAuth();
   const { scanCount, canScan, refreshSubscription } = useSubscription();
+  const { remainingTries, canUseAsGuest, incrementUsage, getUsageToken } = useGuestUsage();
   const [status, setStatus] = useState<ScanStatus>('idle');
   const [progressStep, setProgressStep] = useState(0);
   const [result, setResult] = useState<ScanResult | null>(null);
   const [showPaywall, setShowPaywall] = useState(false);
+  const [showGuestLimit, setShowGuestLimit] = useState(false);
 
   const saveScanToHistory = async (scanResult: ScanResult) => {
     if (!user) return;
@@ -52,21 +56,18 @@ export default function WebsiteRiskScan() {
   };
 
   const handleScan = async (url: string) => {
-    // Check if user is logged in
+    // For unauthenticated users, check guest limit
     if (!user) {
-      toast.error("Please sign in to use the scanner", {
-        action: {
-          label: "Sign in",
-          onClick: () => window.location.href = "/login"
-        }
-      });
-      return;
-    }
-
-    // Check scan limit for logged-in users
-    if (!canScan) {
-      setShowPaywall(true);
-      return;
+      if (!canUseAsGuest) {
+        setShowGuestLimit(true);
+        return;
+      }
+    } else {
+      // For authenticated users, check subscription scan limit
+      if (!canScan) {
+        setShowPaywall(true);
+        return;
+      }
     }
 
     setStatus('scanning');
@@ -78,8 +79,14 @@ export default function WebsiteRiskScan() {
       const progressTimer1 = setTimeout(() => setProgressStep(1), 1500);
       const progressTimer2 = setTimeout(() => setProgressStep(2), 3000);
 
+      // Include guest usage token for backend validation
+      const requestBody: { url: string; guest_token?: string } = { url };
+      if (!user) {
+        requestBody.guest_token = getUsageToken();
+      }
+
       const { data, error } = await supabase.functions.invoke('website-scan', {
-        body: { url }
+        body: requestBody
       });
 
       clearTimeout(progressTimer1);
@@ -93,6 +100,11 @@ export default function WebsiteRiskScan() {
           toast.error("Rate limit exceeded. Please try again in a moment.");
         } else if (error.message?.includes('402')) {
           toast.error("Service limit reached. Please try again later.");
+        } else if (error.message?.includes('403') || error.message?.includes('guest_limit')) {
+          // Backend rejected due to guest limit
+          setShowGuestLimit(true);
+          setStatus('idle');
+          return;
         } else {
           toast.error("We couldn't scan this site. Try again or use demo scan.");
         }
@@ -105,8 +117,13 @@ export default function WebsiteRiskScan() {
         setResult(scanResult);
         setStatus('complete');
         
-        // Save to history for logged-in users
-        await saveScanToHistory(scanResult);
+        // For guests, increment usage count after successful scan
+        if (!user) {
+          incrementUsage();
+        } else {
+          // Save to history for logged-in users
+          await saveScanToHistory(scanResult);
+        }
       } else {
         toast.error("We couldn't scan this site. Try again or use demo scan.");
         setStatus('error');
@@ -123,6 +140,9 @@ export default function WebsiteRiskScan() {
     setResult(null);
     setProgressStep(0);
   };
+
+  // Determine if the scan button should be disabled
+  const isScanDisabled = !user && !canUseAsGuest;
 
   return (
     <>
@@ -141,9 +161,18 @@ export default function WebsiteRiskScan() {
               <br />
               <span className="text-foreground/70">Paste a site. We'll flag risks, dark patterns, and data collection habits.</span>
             </p>
-            {user && (
+            {/* Usage counter */}
+            {user ? (
               <p className="text-sm text-muted-foreground mt-2">
                 Scans used: {scanCount} / {canScan ? "∞" : "2"}
+              </p>
+            ) : (
+              <p className="text-sm text-muted-foreground mt-2">
+                {remainingTries > 0 ? (
+                  <>Free tries remaining: <span className="font-semibold text-primary">{remainingTries}</span></>
+                ) : (
+                  <span className="text-destructive font-medium">Free tries used — Sign up to continue</span>
+                )}
               </p>
             )}
           </div>
@@ -151,7 +180,13 @@ export default function WebsiteRiskScan() {
           {/* Dynamic Content */}
           <AnimatePresence mode="wait">
             {status === 'idle' && (
-              <ScanInput key="input" onScan={handleScan} isLoading={false} />
+              <ScanInput 
+                key="input" 
+                onScan={handleScan} 
+                isLoading={false} 
+                disabled={isScanDisabled}
+                onDisabledClick={() => setShowGuestLimit(true)}
+              />
             )}
             
             {status === 'scanning' && (
@@ -163,7 +198,13 @@ export default function WebsiteRiskScan() {
             )}
             
             {status === 'error' && (
-              <ScanInput key="input-error" onScan={handleScan} isLoading={false} />
+              <ScanInput 
+                key="input-error" 
+                onScan={handleScan} 
+                isLoading={false}
+                disabled={isScanDisabled}
+                onDisabledClick={() => setShowGuestLimit(true)}
+              />
             )}
           </AnimatePresence>
         </div>
@@ -173,6 +214,11 @@ export default function WebsiteRiskScan() {
         open={showPaywall} 
         onOpenChange={setShowPaywall} 
         scanCount={scanCount}
+      />
+
+      <GuestLimitModal
+        open={showGuestLimit}
+        onOpenChange={setShowGuestLimit}
       />
     </>
   );
