@@ -13,6 +13,11 @@ const footerLinks = {
     { name: "Career", href: "/career" },
     { name: "Contact Us", href: "/contact" },
   ],
+  product: [
+    { name: "Roadmap", href: "/roadmap" },
+    { name: "Changelog", href: "/changelog" },
+    { name: "Responsible AI", href: "/about#responsible-ai" },
+  ],
   solutions: [
     { name: "PriXplainer", href: "/solutions/prixplainer" },
     { name: "FoundrFATE", href: "/solutions/foundrfate" },
@@ -40,7 +45,7 @@ export default function Footer() {
       </div>
 
       <div className="section-container py-12 lg:py-16 relative z-10">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-8 lg:gap-12">
           {/* Brand */}
           <motion.div
             className="lg:col-span-1"
@@ -92,12 +97,35 @@ export default function Footer() {
             </ul>
           </motion.div>
 
-          {/* Solutions Links */}
+          {/* Product Links */}
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
+          >
+            <h3 className="font-semibold text-foreground mb-4">Product</h3>
+            <ul className="space-y-3">
+              {footerLinks.product.map((link) => (
+                <li key={link.name}>
+                  <button
+                    onClick={() => handleLinkClick(link.href)}
+                    className="text-sm text-muted-foreground hover:text-primary transition-colors relative group"
+                  >
+                    {link.name}
+                    <span className="absolute -bottom-0.5 left-0 w-0 h-0.5 bg-gradient-to-r from-primary to-accent group-hover:w-full transition-all duration-300" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </motion.div>
+
+          {/* Solutions Links */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5, delay: 0.25 }}
           >
             <h3 className="font-semibold text-foreground mb-4">Solutions</h3>
             <ul className="space-y-3">
