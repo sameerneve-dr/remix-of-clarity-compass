@@ -16,6 +16,18 @@ import type { ScanResult, ScanStatus } from "@/types/scan";
 import type { Json } from "@/integrations/supabase/types";
 import type { PersonaType } from "./PersonaToggle";
 
+// Check for dev bypass - only works on preview/localhost with ?dev=1
+const isDevBypass = (): boolean => {
+  if (typeof window === 'undefined') return false;
+  const hostname = window.location.hostname;
+  const isDevEnvironment = hostname === 'localhost' || 
+                           hostname.includes('127.0.0.1') || 
+                           hostname.includes('.lovable.app') ||
+                           hostname.includes('preview');
+  const hasDevParam = new URLSearchParams(window.location.search).get('dev') === '1';
+  return isDevEnvironment && hasDevParam;
+};
+
 export default function WebsiteRiskScan() {
   const { user } = useAuth();
   const { scanCount, canScan, refreshSubscription } = useSubscription();
@@ -28,6 +40,8 @@ export default function WebsiteRiskScan() {
   const [currentPersona, setCurrentPersona] = useState<PersonaType>('everyday');
   const [lastScannedUrl, setLastScannedUrl] = useState<string>('');
   const [isRescanningPersona, setIsRescanningPersona] = useState(false);
+  
+  const devMode = isDevBypass();
 
   const saveScanToHistory = async (scanResult: ScanResult) => {
     if (!user) return;
@@ -102,17 +116,20 @@ export default function WebsiteRiskScan() {
   const handleScan = async (url: string, personaOverride?: PersonaType) => {
     const persona = personaOverride || currentPersona;
     
-    // For unauthenticated users, check guest limit
-    if (!user) {
-      if (!canUseAsGuest) {
-        setShowGuestLimit(true);
-        return;
-      }
-    } else {
-      // For authenticated users, check subscription scan limit
-      if (!canScan) {
-        setShowPaywall(true);
-        return;
+    // Skip limits in dev mode
+    if (!devMode) {
+      // For unauthenticated users, check guest limit
+      if (!user) {
+        if (!canUseAsGuest) {
+          setShowGuestLimit(true);
+          return;
+        }
+      } else {
+        // For authenticated users, check subscription scan limit
+        if (!canScan) {
+          setShowPaywall(true);
+          return;
+        }
       }
     }
 
@@ -126,12 +143,14 @@ export default function WebsiteRiskScan() {
       const progressTimer1 = setTimeout(() => setProgressStep(1), 1500);
       const progressTimer2 = setTimeout(() => setProgressStep(2), 3000);
 
-      // Include guest usage token and persona for backend
-      const requestBody: { url: string; guest_token?: string; persona: PersonaType } = { 
+      // Include guest usage token, persona, and dev mode for backend
+      const requestBody: { url: string; guest_token?: string; persona: PersonaType; dev_bypass?: boolean } = { 
         url,
         persona
       };
-      if (!user) {
+      if (devMode) {
+        requestBody.dev_bypass = true;
+      } else if (!user) {
         requestBody.guest_token = getUsageToken();
       }
 
@@ -192,8 +211,8 @@ export default function WebsiteRiskScan() {
     setLastScannedUrl('');
   };
 
-  // Determine if the scan button should be disabled
-  const isScanDisabled = !user && !canUseAsGuest;
+  // Determine if the scan button should be disabled (never disabled in dev mode)
+  const isScanDisabled = !devMode && !user && !canUseAsGuest;
 
   return (
     <>
