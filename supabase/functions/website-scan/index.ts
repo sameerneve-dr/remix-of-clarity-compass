@@ -37,7 +37,7 @@ serve(async (req) => {
 
   try {
     const body = await req.json();
-    const { url, guest_token, persona = 'everyday', is_persona_rescan = false } = body;
+    const { url, guest_token, persona = 'everyday', is_persona_rescan = false, dev_bypass = false } = body;
     
     if (!url) {
       return new Response(
@@ -62,8 +62,8 @@ serve(async (req) => {
     }
 
     // For unauthenticated users, validate guest token
-    // Skip limit check for persona rescans (same URL, different perspective)
-    if (!isAuthenticated && !is_persona_rescan) {
+    // Skip limit check for: dev bypass, persona rescans, or authenticated users
+    if (!isAuthenticated && !is_persona_rescan && !dev_bypass) {
       const { valid, count } = validateGuestToken(guest_token);
       
       if (!valid) {
@@ -76,6 +76,10 @@ serve(async (req) => {
           { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
+    }
+    
+    if (dev_bypass) {
+      console.log("Dev bypass enabled - skipping guest limits");
     }
 
     // Normalize the URL/domain
