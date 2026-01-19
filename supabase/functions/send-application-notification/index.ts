@@ -68,8 +68,6 @@ const handler = async (req: Request): Promise<Response> => {
     // Send to both recipients
     const recipients = ["shikha@consenterra.ai", "sameer@consenterra.ai"];
     
-    // Use Resend's default domain until consenterra.ai is verified
-    // To use your own domain, verify it at https://resend.com/domains
     const res = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -77,7 +75,7 @@ const handler = async (req: Request): Promise<Response> => {
         Authorization: `Bearer ${RESEND_API_KEY}`,
       },
       body: JSON.stringify({
-        from: "ConsenTerra Careers <onboarding@resend.dev>",
+        from: "ConsenTerra Careers <careers@consenterra.ai>",
         to: recipients,
         subject: `New Application: ${role} - ${full_name}`,
         html: emailHtml,
