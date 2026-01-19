@@ -41,7 +41,7 @@ export default function Footer() {
   return (
     <footer className="relative border-t border-border/50 bg-card/50 backdrop-blur-sm overflow-hidden">
       {/* Subtle aurora in footer */}
-      <div className="absolute inset-0 opacity-30">
+      <div className="absolute inset-0 opacity-30 pointer-events-none">
         <AuroraBackground showParticles={false} />
       </div>
 
