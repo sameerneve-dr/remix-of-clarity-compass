@@ -96,6 +96,7 @@ export default function Career() {
     setIsSubmitting(true);
 
     try {
+      // Save to database
       const { error } = await supabase
         .from("job_applications")
         .insert({
@@ -110,6 +111,24 @@ export default function Career() {
         });
 
       if (error) throw error;
+
+      // Send email notification to team
+      try {
+        await supabase.functions.invoke("send-application-notification", {
+          body: {
+            full_name: formData.fullName,
+            email: formData.email,
+            phone: formData.phone || null,
+            role: formData.role,
+            linkedin_url: formData.linkedinUrl || null,
+            portfolio_url: formData.portfolioUrl || null,
+            cover_letter: formData.coverLetter || null,
+          },
+        });
+      } catch (emailError) {
+        // Log but don't fail the submission if email fails
+        console.error("Failed to send notification email:", emailError);
+      }
 
       setSubmitted(true);
       toast.success("Application submitted successfully!");
