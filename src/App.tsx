@@ -22,6 +22,11 @@ import Roadmap from "./pages/Roadmap";
 import Changelog from "./pages/Changelog";
 import Research from "./pages/Research";
 import NotFound from "./pages/NotFound";
+import NewPitch from "./pages/foundrfate/NewPitch";
+import Panel from "./pages/foundrfate/Panel";
+import Deal from "./pages/foundrfate/Deal";
+import Success from "./pages/foundrfate/Success";
+import History from "./pages/foundrfate/History";
 
 const queryClient = new QueryClient();
 
@@ -39,6 +44,11 @@ const App = () => (
               <Route path="/solutions" element={<Solutions />} />
               <Route path="/solutions/prixplainer" element={<PriXplainer />} />
               <Route path="/solutions/foundrfate" element={<FoundrFATE />} />
+              <Route path="/solutions/foundrfate/new" element={<NewPitch />} />
+              <Route path="/solutions/foundrfate/panel/:panelId" element={<Panel />} />
+              <Route path="/solutions/foundrfate/deal/:dealId" element={<Deal />} />
+              <Route path="/solutions/foundrfate/success/:dealId" element={<Success />} />
+              <Route path="/solutions/foundrfate/history" element={<History />} />
               <Route path="/solutions/trusteartthy" element={<TrustEarthy />} />
               <Route path="/extension" element={<Extension />} />
               <Route path="/privacy" element={<Privacy />} />
