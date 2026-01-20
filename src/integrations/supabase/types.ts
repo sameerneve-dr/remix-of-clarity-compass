@@ -14,6 +14,41 @@ export type Database = {
   }
   public: {
     Tables: {
+      deals: {
+        Row: {
+          checkout_url: string | null
+          created_at: string
+          deal_terms: Json
+          id: string
+          panel_id: string
+          status: Database["public"]["Enums"]["deal_status"]
+        }
+        Insert: {
+          checkout_url?: string | null
+          created_at?: string
+          deal_terms?: Json
+          id?: string
+          panel_id: string
+          status?: Database["public"]["Enums"]["deal_status"]
+        }
+        Update: {
+          checkout_url?: string | null
+          created_at?: string
+          deal_terms?: Json
+          id?: string
+          panel_id?: string
+          status?: Database["public"]["Enums"]["deal_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "deals_panel_id_fkey"
+            columns: ["panel_id"]
+            isOneToOne: false
+            referencedRelation: "panels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       job_applications: {
         Row: {
           cover_letter: string | null
@@ -74,6 +109,83 @@ export type Database = {
           logged_in_at?: string
           user_agent?: string | null
           user_id?: string
+        }
+        Relationships: []
+      }
+      panels: {
+        Row: {
+          created_at: string
+          id: string
+          offers: Json
+          personas: Json
+          pitch_id: string
+          questions: Json
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          offers?: Json
+          personas?: Json
+          pitch_id: string
+          questions?: Json
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          offers?: Json
+          personas?: Json
+          pitch_id?: string
+          questions?: Json
+        }
+        Relationships: [
+          {
+            foreignKeyName: "panels_pitch_id_fkey"
+            columns: ["pitch_id"]
+            isOneToOne: false
+            referencedRelation: "pitches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pitches: {
+        Row: {
+          arr: number | null
+          ask_amount: number
+          created_at: string
+          equity_percent: number
+          id: string
+          mrr: number | null
+          parsed_json: Json | null
+          raw_pitch_text: string
+          stage: Database["public"]["Enums"]["pitch_stage"] | null
+          startup_name: string | null
+          user_id: string | null
+        }
+        Insert: {
+          arr?: number | null
+          ask_amount: number
+          created_at?: string
+          equity_percent: number
+          id?: string
+          mrr?: number | null
+          parsed_json?: Json | null
+          raw_pitch_text: string
+          stage?: Database["public"]["Enums"]["pitch_stage"] | null
+          startup_name?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          arr?: number | null
+          ask_amount?: number
+          created_at?: string
+          equity_percent?: number
+          id?: string
+          mrr?: number | null
+          parsed_json?: Json | null
+          raw_pitch_text?: string
+          stage?: Database["public"]["Enums"]["pitch_stage"] | null
+          startup_name?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -184,7 +296,8 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      deal_status: "draft" | "accepted" | "declined" | "paid"
+      pitch_stage: "mvp" | "pre_seed" | "seed" | "growth"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -311,6 +424,9 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      deal_status: ["draft", "accepted", "declined", "paid"],
+      pitch_stage: ["mvp", "pre_seed", "seed", "growth"],
+    },
   },
 } as const
